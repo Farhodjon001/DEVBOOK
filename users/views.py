@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSignInSerializer
-
+from django.contrib.auth import authenticate
 # Create your views here.
-class CreateUserAPIView(generics.CreateAPIView):
+class SignUpUserAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -17,11 +17,15 @@ class UserSignInAPIView(APIView):
     def post(self, request):
         serializer = UserSignInSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data['user']
-            refresh = RefreshToken.for_user(user)
+            email = serializer.validated_data['email']
+            password = serializer.validated_data['password']
 
-            return Response({
-                'access_token': str(refresh.access_token),
-            })
+            user = authenticate(email=email, password=password)
 
-        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+            if user:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'access': str(refresh.access_token),
+                })
+
+        return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
