@@ -1,13 +1,25 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
-class BookCreateUpdatePermission(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.roles in (1,2)
-class AuthorCreateUpdatePermissions(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.roles==1
 
-class AuthorUpdatePermissions(BasePermission):
+class AdminPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role == 3
+
     def has_object_permission(self, request, view, obj):
-        return obj.user==request.user
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role == 3
 
+
+class AuthorPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role == 3 or request.user.role == 2
+
+    def has_object_permission(self, request, view, obj):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role == 3 or request.user.role == 2

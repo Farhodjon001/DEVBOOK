@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import User
 class Genre(models.Model):
     type_genre=models.CharField(max_length=100)
 
@@ -8,8 +9,7 @@ class Genre(models.Model):
     class Meta:
         db_table = 'genre'
 class Author(models.Model):
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
     date_of_birth = models.DateField(null=True,blank=True)
     date_of_death = models.DateField(null=True,blank=True)
     country = models.CharField(max_length=200,default='Uzbekistan')
